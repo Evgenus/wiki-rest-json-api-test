@@ -1,4 +1,5 @@
-from .app import app
+from .app import app, db
+from .models import Page, PageVersion, User
 from flask import jsonify, request
 import inspect
 
@@ -65,6 +66,16 @@ def add_page():
         raise InvalidArgumentType("title", str, payload=data)
     if not isinstance(text, str): 
         raise InvalidArgumentType("text", str, payload=data)
+
+    version = PageVersion(title=title, text=text)
+    db.session.add(version)
+    db.session.commit()
+
+    page = Page(current=version.id)
+    db.session.add(page)
+    db.session.commit()
+
+    return jsonify({})
 
 @app.route("/pages", methods=["GET"])
 def list_pages(): 

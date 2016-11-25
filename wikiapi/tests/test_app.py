@@ -1,12 +1,14 @@
 import unittest
 import json
-from wikiapi.app import app
+from wikiapi.app import app, db
+from wikiapi.models import Page, PageVersion
 
 class AppTestCase(unittest.TestCase):
 
     def setUp(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         self.app = app.test_client()
+        db.create_all()
 
     def tearDown(self):
         pass
@@ -65,6 +67,21 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(data.get("error"), "InvalidArgumentType")
         self.assertEqual(data.get("arg_name"), "text")
         self.assertEqual(data.get("type_name"), "str")
+
+    def test_add_page_success(self):
+        payload = json.dumps({
+            "title": "title",
+            "text": "text"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertNotEqual(data, None)
+        self.assertEqual(Page.query.count(), 2)
+        self.assertEqual(PageVersion.query.count(), 2)
+        page1, page2 = Page.query.all()
+        self.assertNotEqual(page1.current, page2.current)
 
 if __name__ == '__main__':
     unittest.main()

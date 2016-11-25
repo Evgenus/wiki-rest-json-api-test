@@ -47,10 +47,7 @@ def handle_exception(error):
     response.status_code = error.status_code
     return response
 
-@app.route("/pages", methods=["POST"])
-def add_page():
-    data = request.get_json()
-
+def check_params(data):
     if data is None:
         raise InvalidRequestBody()
 
@@ -66,6 +63,14 @@ def add_page():
         raise InvalidArgumentType("title", str, payload=data)
     if not isinstance(text, str): 
         raise InvalidArgumentType("text", str, payload=data)
+
+    return title, text
+
+@app.route("/pages", methods=["POST"])
+def add_page():
+    data = request.get_json()
+
+    title, text = check_page_params(data)
 
     page = Page()
     version = PageVersion(title=title, text=text, page=page)

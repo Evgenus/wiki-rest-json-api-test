@@ -47,7 +47,7 @@ def handle_exception(error):
     response.status_code = error.status_code
     return response
 
-def check_params(data):
+def check_page_params(data):
     if data is None:
         raise InvalidRequestBody()
 

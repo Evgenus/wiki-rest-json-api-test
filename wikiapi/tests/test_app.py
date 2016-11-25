@@ -68,7 +68,19 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(data.get("arg_name"), "text")
         self.assertEqual(data.get("type_name"), "str")
 
-    def test_add_page_success(self):
+    def test_add_page_success_simple(self):
+        payload = json.dumps({
+            "title": "title",
+            "text": "text"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertNotEqual(data, None)
+        self.assertEqual(Page.query.count(), 1)
+        self.assertEqual(PageVersion.query.count(), 1)
+
+    def test_add_page_success_double(self):
         payload = json.dumps({
             "title": "title",
             "text": "text"

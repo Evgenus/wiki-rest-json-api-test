@@ -18,4 +18,4 @@ class PageVersion(db.Model):
 
 class Page(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    current = db.Column(db.Integer, db.ForeignKey('page_version.id'))
+    current = db.Column(db.Integer, db.ForeignKey('page_version.id'), nullable=False)

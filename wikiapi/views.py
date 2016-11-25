@@ -147,8 +147,18 @@ def edit_page(page_id):
     title, text = check_page_params(data)
 
     page = db.session.query(Page).get(page_id)
+    version = PageVersion(title=title, text=text, page=page, ancestor=page.current)
+    page.current = version
 
+    db.session.add(version)
+    db.session.commit()
 
+    result = {
+        "page": page.id,
+        "version": version.id,
+    }
+
+    return jsonify(result)
 
 @app.route('/pages/<int:page_id>/versions', methods=['PUT'])
 def set_page_version(page_id):

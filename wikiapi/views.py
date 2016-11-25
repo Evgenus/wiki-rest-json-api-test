@@ -106,14 +106,14 @@ def list_pages():
 
     return jsonify(result)
 
-@app.route('/pages/<int:page>', methods=['GET'])
-def get_page(page):
+@app.route('/pages/<int:page_id>', methods=['GET'])
+def get_page(page_id):
     raise NotImplementedError()
 
-@app.route('/pages/<int:page>/versions', methods=['GET'])
-def get_page_versions(page):
+@app.route('/pages/<int:page_id>/versions', methods=['GET'])
+def get_page_versions(page_id):
     query = db.session.query(PageVersion)
-    query = query.filter(PageVersion.page_id == page)
+    query = query.filter(PageVersion.page_id == page_id)
 
     result = [
         page_version.id
@@ -122,10 +122,10 @@ def get_page_versions(page):
 
     return jsonify(result)
 
-@app.route('/versions/<int:version>', methods=['GET'])
-def get_page_version(version):
+@app.route('/versions/<int:version_id>', methods=['GET'])
+def get_page_version(version_id):
     query = db.session.query(PageVersion)
-    query = query.filter(PageVersion.id == version)
+    query = query.filter(PageVersion.id == version_id)
     query = query.join(Page, PageVersion.page_id == Page.id)
     page_version = query.first()
 
@@ -140,10 +140,16 @@ def get_page_version(version):
 
     return jsonify(result)
 
-@app.route('/pages/<int:page>', methods=['PUT'])
-def edit_page(page):
-    raise NotImplementedError()
+@app.route('/pages/<int:page_id>', methods=['PUT'])
+def edit_page(page_id):
+    data = request.get_json()
 
-@app.route('/pages/<int:page>/versions', methods=['PUT'])
-def set_page_version(page):
+    title, text = check_page_params(data)
+
+    page = db.session.query(Page).get(page_id)
+
+
+
+@app.route('/pages/<int:page_id>/versions', methods=['PUT'])
+def set_page_version(page_id):
     raise NotImplementedError()

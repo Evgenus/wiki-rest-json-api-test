@@ -6,6 +6,7 @@ This sample application was developed as a test job.
 
 ```
 python -m venv venv
+source venv/Scripts/activate
 python setup.py install
 ```
 

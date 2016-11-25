@@ -94,6 +94,7 @@ def list_pages():
     query = query.options(
         db.Load(PageVersion).load_only("title")
         )
+
     result = [
         {
             "id": page.id,
@@ -102,6 +103,7 @@ def list_pages():
         }
         for page in query.all()
     ]
+
     return jsonify(result)
 
 @app.route('/pages/<int:page>', methods=['GET'])

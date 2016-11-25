@@ -67,12 +67,12 @@ def add_page():
     if not isinstance(text, str): 
         raise InvalidArgumentType("text", str, payload=data)
 
-    version = PageVersion(title=title, text=text)
-    db.session.add(version)
-    db.session.commit()
+    page = Page()
+    version = PageVersion(title=title, text=text, page=page)
+    page.current = version
 
-    page = Page(current=version.id)
     db.session.add(page)
+    db.session.add(version)
     db.session.commit()
 
     return jsonify({})

@@ -11,7 +11,7 @@ class AppTestCase(unittest.TestCase):
         db.create_all()
 
     def tearDown(self):
-        pass
+        db.drop_all()
 
     def test_add_page_no_body(self):
         rv = self.app.post("/pages")

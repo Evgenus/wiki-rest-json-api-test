@@ -108,6 +108,9 @@ class AppTestCase(unittest.TestCase):
         data = json.loads(rv.get_data(as_text=True))
         self.assertIsInstance(data, list)
         self.assertEqual(len(data), 2)
+        self.assertIn("title", data[0])
+        self.assertIn("id", data[0])
+        self.assertIn("version", data[0])
 
 if __name__ == '__main__':
     unittest.main()

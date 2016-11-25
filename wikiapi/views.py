@@ -80,7 +80,12 @@ def add_page():
     db.session.add(version)
     db.session.commit()
 
-    return jsonify({})
+    result = {
+        "page": page.id,
+        "version": version.id,
+    }
+
+    return jsonify(result)
 
 @app.route("/pages", methods=["GET"])
 def list_pages(): 

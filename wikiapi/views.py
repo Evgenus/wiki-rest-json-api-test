@@ -108,7 +108,19 @@ def list_pages():
 
 @app.route('/pages/<int:page_id>', methods=['GET'])
 def get_page(page_id):
-    raise NotImplementedError()
+    query = db.session.query(Page)
+    query = query.filter(Page.id == page_id)
+    query = query.join(PageVersion, Page.current_id == PageVersion.id)
+    page = query.first()
+
+    result = {
+        "id": page.id,
+        "version": page.current_id,
+        "title": page.current.title,
+        "text": page.current.text,
+    }
+    
+    return jsonify(result)
 
 @app.route('/pages/<int:page_id>/versions', methods=['GET'])
 def get_page_versions(page_id):

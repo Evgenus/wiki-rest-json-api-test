@@ -180,5 +180,36 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["title"], "title2")
         self.assertEqual(data[0]["version"], version_id_2)
+
+    def test_get_page(self):
+        payload = json.dumps({
+            "title": "title1",
+            "text": "text1"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+        version_id = data["version"]
+        page_id = data["page"]
+
+        rv = self.app.get("/pages/{0}".format(page_id))
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(data["title"], "title1")
+        self.assertEqual(data["version"], version_id)
+
+        payload = json.dumps({
+            "title": "title2",
+            "text": "text2"
+        })
+        rv = self.app.put("/pages/{0}".format(page_id), data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+
+        version_id_2 = data["version"]
+
+        rv = self.app.get("/pages/{0}".format(page_id))
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(data["title"], "title2")
+        self.assertEqual(data["version"], version_id_2)
+
+
 if __name__ == '__main__':
     unittest.main()

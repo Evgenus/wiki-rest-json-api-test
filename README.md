@@ -15,3 +15,10 @@ python setup.py install
 ```
 python run.py
 ```
+
+## What is missing
+
+- Users registration, login, sessions
+- User roles and check rights for making changes
+- More tests could be made
+- Add `alembic` for database migration

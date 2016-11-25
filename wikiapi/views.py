@@ -41,6 +41,14 @@ class InvalidArgumentType(InvalidArgument):
         self.payload["arg_name"] = name
         self.payload["type_name"] = type.__name__
 
+class InvalidArgumentValue(InvalidArgument):
+    """
+    Field `{0}` has invalid value.
+    """
+    def __init__(self, name, **kwargs):
+        super().__init__(inspect.getdoc(self).format(name))
+        self.payload["arg_name"] = name
+
 @app.errorhandler(InvalidArgument)
 def handle_exception(error):
     response = jsonify(error.to_dict())
@@ -119,7 +127,7 @@ def get_page(page_id):
         "title": page.current.title,
         "text": page.current.text,
     }
-    
+
     return jsonify(result)
 
 @app.route('/pages/<int:page_id>/versions', methods=['GET'])
@@ -174,4 +182,31 @@ def edit_page(page_id):
 
 @app.route('/pages/<int:page_id>/versions', methods=['PUT'])
 def set_page_version(page_id):
-    raise NotImplementedError()
+    data = request.get_json()
+    if data is None:
+        raise InvalidRequestBody()
+
+    if "version" not in data:
+        raise RequiredArgument("version", payload=data)
+
+    version_id = data["version"]
+
+    if not isinstance(version_id, int): 
+        raise InvalidArgumentType("version", int, payload=data)
+
+    page = db.session.query(Page).get(page_id)
+    version = db.session.query(PageVersion).get(version_id)
+
+    if version.page_id != page_id:
+        # we have not changed anything here so no need to rollback
+        raise InvalidArgumentValue("version", payload=data)
+
+    page.current = version
+    db.session.commit()
+
+    result = {
+        "page": page.id,
+        "version": version.id,
+    }
+
+    return jsonify(result)

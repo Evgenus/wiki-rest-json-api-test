@@ -210,6 +210,102 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(data["title"], "title2")
         self.assertEqual(data["version"], version_id_2)
 
+    def test_change_page_version(self):
+        payload = json.dumps({
+            "title": "title1",
+            "text": "text1"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+        version_id = data["version"]
+        page_id = data["page"]
+
+        payload = json.dumps({
+            "title": "title2",
+            "text": "text2"
+        })
+        rv = self.app.put("/pages/{0}".format(page_id), data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+
+        version_id_2 = data["version"]
+
+        payload = json.dumps({
+            "title": "title3",
+            "text": "text3"
+        })
+        rv = self.app.put("/pages/{0}".format(page_id), data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+
+        version_id_3 = data["version"]
+
+        rv = self.app.get("/pages/{0}".format(page_id))
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(data["title"], "title3")
+        self.assertEqual(data["version"], version_id_3)
+
+        payload = json.dumps({
+            "version": version_id
+        })
+        rv = self.app.put("/pages/{0}/versions".format(page_id), data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+
+        rv = self.app.get("/pages/{0}".format(page_id))
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(data["title"], "title1")
+        self.assertEqual(data["version"], version_id)
+        
+    def test_change_page_version_fail(self):
+        payload = json.dumps({
+            "title": "title1other",
+            "text": "text1"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+        version_id_other = data["version"]
+
+        payload = json.dumps({
+            "title": "title1",
+            "text": "text1"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+        version_id = data["version"]
+        page_id = data["page"]
+
+        payload = json.dumps({
+            "title": "title2",
+            "text": "text2"
+        })
+        rv = self.app.put("/pages/{0}".format(page_id), data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+
+        version_id_2 = data["version"]
+
+        payload = json.dumps({
+            "title": "title3",
+            "text": "text3"
+        })
+        rv = self.app.put("/pages/{0}".format(page_id), data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+
+        version_id_3 = data["version"]
+
+        rv = self.app.get("/pages/{0}".format(page_id))
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertEqual(data["title"], "title3")
+        self.assertEqual(data["version"], version_id_3)
+
+        payload = json.dumps({
+            "version": version_id_other
+        })
+        rv = self.app.put("/pages/{0}/versions".format(page_id), data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+
+        self.assertEqual(rv.status_code, 400)
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertNotEqual(data, None)
+        self.assertEqual(data.get("error"), "InvalidArgumentValue")
+        self.assertEqual(data.get("arg_name"), "version")
 
 if __name__ == '__main__':
     unittest.main()

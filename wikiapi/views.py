@@ -16,10 +16,17 @@ class InvalidArgument(Exception):
 
 class RequiredArgument(InvalidArgument):
     """
-    field `{0}` is required for this request
+    Field `{0}` is required.
     """
     def __init__(self, name, **kwargs):
         super().__init__(inspect.getdoc(self).format(name))
+
+class InvalidArgumentType(InvalidArgument):
+    """
+    Field `{0}` has value of invalid type. `{1}` value required.
+    """
+    def __init__(self, name, type, **kwargs):
+        super().__init__(inspect.getdoc(self).format(name, type))
 
 @app.errorhandler(InvalidArgument)
 def handle_exception(error):
@@ -33,6 +40,14 @@ def add_page():
         raise RequiredArgument("title", request.json)
     if "text" not in request.json:
         raise RequiredArgument("text", request.json)
+
+    title = request.json["title"]
+    text = request.json["text"]
+
+    if isinstance(title, str): 
+        raise InvalidArgumentType("title", str, request.json)
+    if isinstance(text, str): 
+        raise InvalidArgumentType("text", str, request.json)
 
 @app.route("/pages", methods=["GET"])
 def list_pages(): 

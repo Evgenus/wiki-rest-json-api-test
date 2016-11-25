@@ -93,7 +93,8 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(Page.query.count(), 2)
         self.assertEqual(PageVersion.query.count(), 2)
         page1, page2 = Page.query.all()
-        self.assertNotEqual(page1.current, page2.current)
+        self.assertNotEqual(page1.id, page2.id)
+        self.assertNotEqual(page1.current_id, page2.current_id)
 
 if __name__ == '__main__':
     unittest.main()

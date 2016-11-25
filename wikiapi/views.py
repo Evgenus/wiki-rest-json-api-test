@@ -48,7 +48,7 @@ def handle_exception(error):
     return response
 
 @app.route("/pages", methods=["POST"])
-def add_page(): 
+def add_page():
     data = request.get_json()
 
     if data is None:
@@ -81,18 +81,18 @@ def add_page():
 def list_pages(): 
     raise NotImplementedError()
 
-@app.route('/pages/<string:page>', methods=['GET'])
-def get_page():
+@app.route('/pages/<int:page>', methods=['GET'])
+def get_page(page):
     raise NotImplementedError()
 
-@app.route('/pages/<string:page>/versions', methods=['GET'])
-def get_page_versions():
+@app.route('/pages/<int:page>/versions', methods=['GET'])
+def get_page_versions(page):
     raise NotImplementedError()
 
-@app.route('/pages/<string:page>', methods=['PUT'])
-def edit_page():
+@app.route('/pages/<int:page>', methods=['PUT'])
+def edit_page(page):
     raise NotImplementedError()
 
-@app.route('/pages/<string:page>/versions', methods=['PUT'])
-def set_page_version():
+@app.route('/pages/<int:page>/versions', methods=['PUT'])
+def set_page_version(page):
     raise NotImplementedError()

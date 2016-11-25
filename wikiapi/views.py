@@ -61,9 +61,9 @@ def add_page():
     title = data["title"]
     text = data["text"]
 
-    if isinstance(title, str): 
+    if not isinstance(title, str): 
         raise InvalidArgumentType("title", str, payload=data)
-    if isinstance(text, str): 
+    if not isinstance(text, str): 
         raise InvalidArgumentType("text", str, payload=data)
 
 @app.route("/pages", methods=["GET"])

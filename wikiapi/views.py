@@ -8,12 +8,20 @@ class InvalidArgument(Exception):
     def __init__(self, message, payload=None):
         super().__init__(self)
         self.message = message
-        self.payload = payload
+        self.payload = dict(payload or ())
 
     def to_dict(self):
-        rv = dict(self.payload or ())
+        rv = dict(self.payload)
         rv['message'] = self.message
+        rv['error'] = type(self).__name__
         return rv
+
+class InvalidRequestBody(InvalidArgument):
+    """
+    Required JSON body
+    """
+    def __init__(self):
+        super().__init__(inspect.getdoc(self))
 
 class RequiredArgument(InvalidArgument):
     """
@@ -21,6 +29,7 @@ class RequiredArgument(InvalidArgument):
     """
     def __init__(self, name, **kwargs):
         super().__init__(inspect.getdoc(self).format(name))
+        self.payload["arg_name"] = name
 
 class InvalidArgumentType(InvalidArgument):
     """
@@ -28,6 +37,8 @@ class InvalidArgumentType(InvalidArgument):
     """
     def __init__(self, name, type, **kwargs):
         super().__init__(inspect.getdoc(self).format(name, type))
+        self.payload["arg_name"] = name
+        self.payload["type_name"] = type.__name__
 
 @app.errorhandler(InvalidArgument)
 def handle_exception(error):
@@ -37,18 +48,23 @@ def handle_exception(error):
 
 @app.route("/pages", methods=["POST"])
 def add_page(): 
-    if "title" not in request.json:
-        raise RequiredArgument("title", request.json)
-    if "text" not in request.json:
-        raise RequiredArgument("text", request.json)
+    data = request.get_json()
 
-    title = request.json["title"]
-    text = request.json["text"]
+    if data is None:
+        raise InvalidRequestBody()
+
+    if "title" not in data:
+        raise RequiredArgument("title", payload=data)
+    if "text" not in data:
+        raise RequiredArgument("text", payload=data)
+
+    title = data["title"]
+    text = data["text"]
 
     if isinstance(title, str): 
-        raise InvalidArgumentType("title", str, request.json)
+        raise InvalidArgumentType("title", str, payload=data)
     if isinstance(text, str): 
-        raise InvalidArgumentType("text", str, request.json)
+        raise InvalidArgumentType("text", str, payload=data)
 
 @app.route("/pages", methods=["GET"])
 def list_pages(): 

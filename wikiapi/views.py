@@ -111,6 +111,21 @@ def get_page(page):
 @app.route('/pages/<int:page>/versions', methods=['GET'])
 def get_page_versions(page):
     raise NotImplementedError()
+@app.route('/versions/<int:version>', methods=['GET'])
+def get_page_version(version):
+    query = db.session.query(PageVersion)
+    query = query.filter(PageVersion.id == version)
+    query = query.join(Page, PageVersion.page_id == Page.id)
+    page_version = query.first()
+
+    result = {
+        "id": page_version.id,
+        "page": page_version.page_id,
+        "current": page_version.page.current_id,
+        "ancestor": page_version.ancestor_id
+    }
+
+    return jsonify(result)
 
 @app.route('/pages/<int:page>', methods=['PUT'])
 def edit_page(page):

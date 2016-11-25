@@ -129,5 +129,25 @@ class AppTestCase(unittest.TestCase):
 
         self.assertSequenceEqual(data, [version_id])
 
+    def test_page_version_simple(self):
+        payload = json.dumps({
+            "title": "title",
+            "text": "text"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+        version_id = data["version"]
+        page_id = data["page"]
+
+        rv = self.app.get("/versions/{0}".format(version_id))
+        data = json.loads(rv.get_data(as_text=True))
+
+        self.assertEqual(data["id"], version_id)
+        self.assertEqual(data["page"], page_id)
+        self.assertEqual(data["current"], version_id)
+        self.assertEqual(data["ancestor"], None)
+        self.assertEqual(data["title"], "title")
+        self.assertEqual(data["text"], "text")
+
 if __name__ == '__main__':
     unittest.main()

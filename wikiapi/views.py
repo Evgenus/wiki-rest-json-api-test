@@ -79,7 +79,20 @@ def add_page():
 
 @app.route("/pages", methods=["GET"])
 def list_pages(): 
-    raise NotImplementedError()
+    query = db.session.query(Page)
+    query = query.join(PageVersion, Page.current_id == PageVersion.id)
+    query = query.options(
+        db.Load(PageVersion).load_only("title")
+        )
+    result = [
+        {
+            "id": page.id,
+            "version": page.current_id,
+            "title": page.current.title,
+        }
+        for page in query.all()
+    ]
+    return jsonify(result)
 
 @app.route('/pages/<int:page>', methods=['GET'])
 def get_page(page):

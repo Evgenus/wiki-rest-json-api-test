@@ -96,5 +96,18 @@ class AppTestCase(unittest.TestCase):
         self.assertNotEqual(page1.id, page2.id)
         self.assertNotEqual(page1.current_id, page2.current_id)
 
+    def test_list_pages(self):
+        payload = json.dumps({
+            "title": "title",
+            "text": "text"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        rv = self.app.get("/pages")
+        self.assertEqual(rv.status_code, 200)
+        data = json.loads(rv.get_data(as_text=True))
+        self.assertIsInstance(data, list)
+        self.assertEqual(len(data), 2)
+
 if __name__ == '__main__':
     unittest.main()

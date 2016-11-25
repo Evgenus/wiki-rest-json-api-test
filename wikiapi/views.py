@@ -122,7 +122,9 @@ def get_page_version(version):
         "id": page_version.id,
         "page": page_version.page_id,
         "current": page_version.page.current_id,
-        "ancestor": page_version.ancestor_id
+        "ancestor": page_version.ancestor_id,
+        "title": page_version.title,
+        "text": page_version.text,
     }
 
     return jsonify(result)

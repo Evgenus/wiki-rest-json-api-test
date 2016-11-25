@@ -1,4 +1,5 @@
-from wikiapi import app
+from wikiapi.app import app
+from flask import jsonify
 
 @app.route("/pages", methods=["POST"])
 def add_page(): 

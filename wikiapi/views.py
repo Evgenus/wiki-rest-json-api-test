@@ -1,9 +1,38 @@
-from wikiapi.app import app
-from flask import jsonify
+from .app import app
+from flask import jsonify, request
+
+class InvalidArgument(Exception):
+    status_code = 400
+
+    def __init__(self, message, payload=None):
+        super().__init__(self)
+        self.message = message
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+class RequiredArgument(InvalidArgument):
+    """
+    field `{0}` is required for this request
+    """
+    def __init__(self, name, **kwargs):
+        super().__init__(inspect.getdoc(self).format(name))
+
+@app.errorhandler(InvalidArgument)
+def handle_exception(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
 
 @app.route("/pages", methods=["POST"])
 def add_page(): 
-    raise NotImplementedError()
+    if "title" not in request.json:
+        raise RequiredArgument("title", request.json)
+    if "text" not in request.json:
+        raise RequiredArgument("text", request.json)
 
 @app.route("/pages", methods=["GET"])
 def list_pages(): 

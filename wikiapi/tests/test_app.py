@@ -79,6 +79,8 @@ class AppTestCase(unittest.TestCase):
         self.assertNotEqual(data, None)
         self.assertEqual(Page.query.count(), 1)
         self.assertEqual(PageVersion.query.count(), 1)
+        self.assertIn("page", data)
+        self.assertIn("version", data)
 
     def test_add_page_success_double(self):
         payload = json.dumps({
@@ -111,6 +113,21 @@ class AppTestCase(unittest.TestCase):
         self.assertIn("title", data[0])
         self.assertIn("id", data[0])
         self.assertIn("version", data[0])
+
+    def test_page_versions_simple(self):
+        payload = json.dumps({
+            "title": "title",
+            "text": "text"
+        })
+        rv = self.app.post("/pages", data=payload, content_type='application/json')
+        data = json.loads(rv.get_data(as_text=True))
+        version_id = data["version"]
+        page_id = data["page"]
+
+        rv = self.app.get("/pages/{0}/versions".format(page_id))
+        data = json.loads(rv.get_data(as_text=True))
+
+        self.assertSequenceEqual(data, [version_id])
 
 if __name__ == '__main__':
     unittest.main()

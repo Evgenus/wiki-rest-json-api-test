@@ -1,6 +1,8 @@
 ### Wiki REST JSON Api Test
 
-This sample application was developed as a test job.
+This sample application was developed as a test home assignment.
+
+Technologies: Python, Flask, SQL, Rest
 
 ## Instalation
 
